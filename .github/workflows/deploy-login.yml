@@ -37,12 +37,12 @@ jobs:
             # Install Docker if it's not installed
             if ! command -v docker &> /dev/null
             then
-              echo "Docker not found. Installing Docker..."
               sudo dnf update -y
-              sudo dnf install -y docker.io
+              sudo dnf install -y docker
               sudo systemctl start docker
               sudo systemctl enable docker
-              sudo usermod -aG docker $USER
+              sudo groupadd docker
+              sudo usermod -aG docker ec2-user
             fi
             # Stop and remove existing container if exists
             sudo docker stop login-service || echo "No existing process found"
