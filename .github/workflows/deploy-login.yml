@@ -117,7 +117,5 @@ jobs:
             sudo docker rm frontend-service || echo "No existing process found"
             # Pull and run the latest image
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:latest
-            sudo docker run -d -p 80:3000 --name frontend-service \
-              -e NEXT_PUBLIC_API_URL=http://ec2-3-82-209-106.compute-1.amazonaws.com:3001 
-
-              ${{ secrets.DOCKER_USERNAME }}/frontend:latest
+            sudo docker run -d -p 80:3000 --name frontend-service -e NEXT_PUBLIC_API_URL="http://ec2-3-82-209-106.compute-1.amazonaws.com:3001" ${{ secrets.DOCKER_USERNAME }}/frontend:latest
+            
