@@ -3,7 +3,7 @@ name: Deploy Services on AWS QA
 on:
   push:
     branches:
-      - test1
+      - test2
 jobs:
   push_to_registry:
     name: Push Docker Images to Docker Hub
