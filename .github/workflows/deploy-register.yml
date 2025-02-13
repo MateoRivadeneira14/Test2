@@ -1,59 +1,54 @@
-name: Deploy Register Microservice
+name: Deploy Register Microservices to EC2
 
 on:
   push:
     branches:
-      - test1  # Este workflow se ejecutará cuando haya un push a la rama main
+      - test1
 
 jobs:
-  build_and_deploy:
+  push_to_registry:
+    name: Push Docker Images to Docker Hub
     runs-on: ubuntu-latest
-    
     steps:
-      # Paso 1: Configurar el acceso a Docker Hub
-      - name: Check out code
-        uses: actions/checkout@v2
+      - name: Check out the repo
+        uses: actions/checkout@v3
 
-      # Paso 2: Configuración de Docker
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+      - name: Login to Docker Hub
+        uses: docker/register-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Paso 3: Construir la imagen de Docker
-      - name: Build Docker image
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/register:latest .
+      - name: Build and push register image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./BackEnd/Domains/Users/
+          file: ./BackEnd/Domains/Users/Register/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/register-service:latest
 
-      # Paso 4: Subir la imagen de Docker a Docker Hub
-      - name: Push Docker image
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/register:latest
-
-      # Paso 5: Conectar a la instancia EC2 y desplegar
-      - name: SSH to EC2 and deploy
+      - name: Executing remote ssh on EC2 server for register
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.DNS_REGISTER }}
           username: ${{ secrets.EC2_USER_UB }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Paso 5.1: Detener y eliminar el contenedor antiguo (si existe)
+            # Install Docker if it's not installed
+            if ! command -v docker &> /dev/null
+            then
+              echo "Docker not found. Installing Docker..."
+              sudo apt-get update -y
+              sudo apt-get install -y docker.io
+              sudo systemctl start docker
+              sudo systemctl enable docker
+            fi
+            # Stop and remove existing container if exists
             sudo docker stop register-service || echo "No existing process found"
             sudo docker rm register-service || echo "No existing process found"
-
-            # Paso 5.2: Obtener la última imagen desde Docker Hub
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/register:latest
-
-            # Paso 5.3: Ejecutar el nuevo contenedor
-            sudo docker run -d -p 3004:3004 --name register-service \
+            # Pull and run the latest image
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/register-service:latest
+            sudo docker run -d -p 3004:3004 --name login-service \
               -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
               -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-              ${{ secrets.DOCKER_USERNAME }}/register:latest
-
-
-  
+              ${{ secrets.DOCKER_USERNAME }}/register-service
