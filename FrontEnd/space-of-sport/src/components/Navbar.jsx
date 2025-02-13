@@ -93,12 +93,6 @@ const Navbar = () => {
               </ul>
             </li>
 
-            <li className="nav-item">
-              <Link href="/Cart" className="nav-link">
-                Cart
-              </Link>
-            </li>
-
             {/* Opción ProductsAdmin */}
             <li className="nav-item">
               <Link href="/Products" className="nav-link">

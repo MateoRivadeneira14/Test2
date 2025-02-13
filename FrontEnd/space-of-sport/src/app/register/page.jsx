@@ -17,7 +17,7 @@ const RegisterPage = () => {
         setSuccess('');
 
         try {
-            const response = await fetch('http://localhost:3004/register', {
+            const response = await fetch('http://ec2-34-238-83-117.compute-1.amazonaws.com:3004/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, email, password })

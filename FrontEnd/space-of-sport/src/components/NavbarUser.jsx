@@ -23,7 +23,7 @@ const NavbarUser = () => {
                     <span className="bg-white text-primary px-2 py-1 rounded">B</span>
                 </a>
                 <Link href="/" className="navbar-brand">
-                    Space of Sport
+                    WEBSITEFRESST
                 </Link>
 
                 {/* Botón de menú responsivo */}
