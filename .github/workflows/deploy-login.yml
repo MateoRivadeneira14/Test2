@@ -65,7 +65,7 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.DNS_VALIDATE }}
-          username: ${{ secrets.EC2_USER }}
+          username: ${{ secrets.EC2_USER_UB }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             # Install Docker if it's not installed
@@ -100,7 +100,7 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.DNS_FRONTEND }}
-          username: ${{ secrets.EC2_USER }}
+          username: ${{ secrets.EC2_USER_UB }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             # Install Docker if it's not installed
