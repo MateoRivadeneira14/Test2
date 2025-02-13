@@ -41,7 +41,7 @@ router.post('/', async (req, res) => { // Define a POST route for login
 
         // Make a request to an external validation service to further verify the credentials (optional)
         //const validationResponse = await axios.post('http://localhost:3003/validation/authenticate', {
-        const validationResponse = await axios.post('http://ec2-100-24-67-174.compute-1.amazonaws.com:3003/validation/authenticate', {
+        const validationResponse = await axios.post('http://ec2-54-84-163-232.compute-1.amazonaws.com:3003/validation/authenticate', {
         //const validationResponse = await axios.post('http://validate:3003/validation/authenticate', { // External service URL for validation
             email,
             password,

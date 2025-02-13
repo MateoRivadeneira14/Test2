@@ -31,29 +31,29 @@ const LoginPage = () => {
         setErrorMessage(null);
 
         if (!formData.email || !formData.password) {
-            setErrorMessage('Please enter both fields: email and password');
+            setErrorMessage('Por favor ingrese ambos campos: email y contraseña');
             setIsLoading(false);
             return;
         }
 
         try {
-            const { data } = await axios.post('http://localhost:3001/login', formData);
+            const { data } = await axios.post('http://ec2-44-201-242-24.compute-1.amazonaws.com:3001/login', formData);
             const { token, role } = data;
 
             Cookies.set('token', token, { expires: 5 });
             Cookies.set('role', role, { expires: 5 });
 
-            alert(`Welcome, ${role === 'admin' ? 'Admin' : 'User'}`);
+            alert(`Bienvenido, ${role === 'admin' ? 'Admin' : 'Usuario'}`);
             router.push(role === 'admin' ? '/admin' : '/user');
         } catch (error) {
             const status = error.response?.status;
             const messages = {
-                400: 'Invalid data. Check the fields.',
-                401: 'Incorrect credentials.',
-                500: 'Server error. Please try again later.',
+                400: 'Datos inválidos. Verifica los campos.',
+                401: 'Credenciales incorrectas.',
+                500: 'Error en el servidor. Intenta más tarde.',
             };
 
-            setErrorMessage(messages[status] || 'Unknown error. Please try again.');
+            setErrorMessage(messages[status] || 'Error desconocido. Intenta nuevamente.');
         } finally {
             setIsLoading(false);
         }
@@ -62,7 +62,7 @@ const LoginPage = () => {
     return (
         <div className="login-container">
             <div className="login-box">
-                <h1 className="login-title">Login</h1>
+                <h1 className="login-title">Iniciar Sesión</h1>
                 <form onSubmit={handleLogin}>
                     {['email', 'password'].map((field) => (
                         <div className="form-group" key={field}>
@@ -82,11 +82,11 @@ const LoginPage = () => {
                     ))}
                     {errorMessage && <div className="error-message">{errorMessage}</div>}
                     <button type="submit" disabled={isLoading} className="login-button">
-                        {isLoading ? 'Loading...' : 'Login'}
+                        {isLoading ? 'Cargando...' : 'Iniciar Sesión'}
                     </button>
                 </form>
                 <p className="register-link">
-                    Don't have an account? <a href="/register">Sign up</a>
+                    ¿No tienes cuenta? <a href="/register">Regístrate</a>
                 </p>
                 <button onClick={() => router.push('/')} className="back-home-button">
                     Back to Home
