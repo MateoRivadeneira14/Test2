@@ -3,7 +3,7 @@ name: Deploy Register Microservices to EC2
 on:
   push:
     branches:
-      - test1
+      - test2
 
 jobs:
   push_to_registry:
