@@ -34,8 +34,19 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            # Install Docker if it's not installed
+            if ! command -v docker &> /dev/null
+            then
+              echo "Docker not found. Installing Docker..."
+              sudo apt-get update -y
+              sudo apt-get install -y docker.io
+              sudo systemctl start docker
+              sudo systemctl enable docker
+            fi
+            # Stop and remove existing container if exists
             sudo docker stop login-service || echo "No existing process found"
             sudo docker rm login-service || echo "No existing process found"
+            # Pull and run the latest image
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/login-service:latest
             sudo docker run -d -p 80:3001 --name login-service \
               -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
@@ -56,34 +67,55 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            # Install Docker if it's not installed
+            if ! command -v docker &> /dev/null
+            then
+              echo "Docker not found. Installing Docker..."
+              sudo apt-get update -y
+              sudo apt-get install -y docker.io
+              sudo systemctl start docker
+              sudo systemctl enable docker
+            fi
+            # Stop and remove existing container if exists
             sudo docker stop validate-service || echo "No existing process found"
             sudo docker rm validate-service || echo "No existing process found"
+            # Pull and run the latest image
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/validate-service:latest
-            sudo docker run -d -p 80:3003 --name validate-service \
+            sudo docker run -d -p 80:3002 --name validate-service \
               -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
               ${{ secrets.DOCKER_USERNAME }}/validate-service
 
        # Build and push Frontend (Next.js + React) Docker image
-      - name: Build and push Frontend Docker image
+      - name: Build and push Docker image for Frontend
         uses: docker/build-push-action@v4
         with:
           context: ./FrontEnd/space-of-sport
           file: ./FrontEnd/space-of-sport/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/frontend-service:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/frontend:latest
 
       # Deploy Frontend Docker image to EC2 instance
-      - name: Deploy Frontend to EC2
+      - name: Install Docker on EC2 instance
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.DNS_FRONTEND }}
-          username: ${{ secrets.EC2_USER_UB }}
+          username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            # Install Docker if it's not installed
+            if ! command -v docker &> /dev/null
+            then
+              echo "Docker not found. Installing Docker..."
+              sudo apt-get update -y
+              sudo apt-get install -y docker.io
+              sudo systemctl start docker
+              sudo systemctl enable docker
+            fi
+            # Stop and remove existing container if exists
             sudo docker stop frontend-service || echo "No existing process found"
             sudo docker rm frontend-service || echo "No existing process found"
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/frontend-service:latest
-            sudo docker run -d -p 3000:3000 --name frontend-service \
-              -e NEXT_PUBLIC_API_URL=http://ec2-3-82-209-106.compute-1.amazonaws.com:3001
-
-              ${{ secrets.DOCKER_USERNAME }}/frontend-service
+            # Pull and run the latest image
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:latest
+            sudo docker run -d -p 80:3000 --name frontend-service \
+              -e NEXT_PUBLIC_API_URL=http://<backend-ip>:<backend-port> \
+              ${{ secrets.DOCKER_USERNAME }}/frontend:latest
