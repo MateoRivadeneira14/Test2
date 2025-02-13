@@ -99,7 +99,7 @@ jobs:
       - name: Install Docker on EC2 instance
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.DNS_FRONTEND }}
+          host: ${{ secrets.DNS_FRONT }}
           username: ${{ secrets.EC2_USER_UB }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
@@ -118,5 +118,6 @@ jobs:
             # Pull and run the latest image
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:latest
             sudo docker run -d -p 80:3000 --name frontend-service \
-              -e NEXT_PUBLIC_API_URL=http://<backend-ip>:<backend-port> \
+              -e NEXT_PUBLIC_API_URL=http://ec2-3-82-209-106.compute-1.amazonaws.com:3001 \
+
               ${{ secrets.DOCKER_USERNAME }}/frontend:latest
