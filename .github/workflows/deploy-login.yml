@@ -57,7 +57,7 @@ jobs:
       - name: Build and push register image
         uses: docker/build-push-action@v4
         with:
-          context: ./BackEnd/Domains/Users/
+          context: ./BackEnd/Domains/Users/Register
           file: ./BackEnd/Domains/Users/Register/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/register-service:latest
